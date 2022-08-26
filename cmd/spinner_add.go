@@ -4,10 +4,16 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
+	"spinnerdex-cli/utils"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
+
+var board string
+var twitter string
+var youtube string
 
 // spinnerAddCmd represents the spinnerAdd command
 var spinnerAddCmd = &cobra.Command{
@@ -20,29 +26,33 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("spinnerAdd called")
+		if len(args) == 0 {
+			color.Red("Please provide a name for the spinner")
+		} else if len(args) >= 2 {
+			color.Red("Please provide only one name for the spinner")
+		} else {
+			name := args[0]
+			board := board
+			twitter := twitter
+			youtube := youtube
+			apiKey := viper.GetString("api-key")
+			spinner := utils.Spinner{
+				Name:    name,
+				Twitter: twitter,
+				Youtube: youtube,
+				Board:   board,
+			}
+			utils.AddSpinner(spinner, apiKey)
+		}
 	},
 }
 
 func init() {
 	spinnerCmd.AddCommand(spinnerAddCmd)
 
-	spinnerAddCmd.Flags().StringP("name", "n", "", "The name of the spinner")
-	spinnerAddCmd.MarkFlagRequired("name")
-
-	spinnerAddCmd.Flags().StringP("board", "b", "", "The board the spinner is from")
+	spinnerAddCmd.Flags().StringVarP(&board, "board", "b", "", "The board the spinner is from")
 	spinnerAddCmd.MarkFlagRequired("board")
 
-	spinnerAddCmd.Flags().StringP("twitter", "t", "", "The Twitter link of the spinner")
-	spinnerAddCmd.Flags().StringP("youtube", "y", "", "The YouTube link of the spinner")
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// spinnerAddCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// spinnerAddCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	spinnerAddCmd.Flags().StringVarP(&twitter, "twitter", "t", "", "The Twitter link of the spinner")
+	spinnerAddCmd.Flags().StringVarP(&youtube, "youtube", "y", "", "The YouTube link of the spinner")
 }
